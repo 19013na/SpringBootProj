@@ -2,12 +2,15 @@ package com.basic.myspringboot.controller;
 
 
 import com.basic.myspringboot.entity.User;
+import com.basic.myspringboot.exception.BusinessException;
 import com.basic.myspringboot.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 // @Controller + @ResponseBody
 @RestController
@@ -25,5 +28,50 @@ public class UserRestController {
     @PostMapping
     public User create(@RequestBody User user) {
         return userRepository.save(user);
+    }
+
+    @GetMapping
+    public List<User> getUsers(){
+        return userRepository.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id){
+        Optional<User> optionalUser = userRepository.findById(id);
+        // public <U> Optional<U> map(Function<? super T. ? extends U> mapper)
+        // Function의 추상메서드 R apply(T t)
+        /*
+        ResponseEntity<User> responseEntity = optionalUser.map(user -> ResponseEntity.ok(user))  // Optional<ResponseEntity>
+                .orElse(ResponseEntity.notFound().build());
+        return responseEntity;
+        */
+        // 람다식으로 수정
+//        return optionalUser.map(ResponseEntity::ok)
+//                .orElse(ResponseEntity.notFound().build());
+        // 오류는 메시지 주기
+        return optionalUser.map(ResponseEntity::ok)
+                .orElse(new ResponseEntity("User Not Found", HttpStatus.NOT_FOUND));
+    }
+
+    // Exception 사용
+    @GetMapping("/email/{email}/")
+    public User getUserByEmail(@PathVariable String email){
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        User existUser = optionalUser.orElseThrow(() ->
+                new BusinessException("User Not Found", HttpStatus.NOT_FOUND));
+        return existUser;
+    }
+
+    // 수정
+    // 부분수정이라서 PatchMapping으로
+    @PatchMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetail){
+        User existUser = userRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("User Not Found", HttpStatus.NOT_FOUND));
+        //setter method 호출
+        existUser.setName(userDetail.getName());
+//        User updatedUser = userRepository.save(existUser);
+//        return ResponseEntity.ok(updatedUser);
+        return ResponseEntity.ok(userRepository.save(existUser));
     }
 }
