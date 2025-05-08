@@ -51,11 +51,11 @@ class CustomerRepositoryTest {
         // Supplier 의 추상메서드 T get()
         Customer customer = customerRepository.findByCustomerId("A004")
                 .orElseThrow(() -> new RuntimeException("Customer Not Found"));
-        //assertThat(customer.getCustomerId()).isEqualTo("A001");
+        //        //assertThat(customer.getCustomerId()).isEqualTo("A001");
     }
 
     @Test
-    //@Disabled
+        //@Disabled
     void testFindBy() {
         Optional<Customer> optionalCustomer = customerRepository.findById(1L); // ctrl + alt + v
 
