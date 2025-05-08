@@ -57,8 +57,7 @@ public class UserRestController {
     @GetMapping("/email/{email}/")
     public User getUserByEmail(@PathVariable String email){
         Optional<User> optionalUser = userRepository.findByEmail(email);
-        User existUser = optionalUser.orElseThrow(() ->
-                new BusinessException("User Not Found", HttpStatus.NOT_FOUND));
+        final User existUser = getExistUser(optionalUser);
         return existUser;
     }
 
@@ -66,12 +65,28 @@ public class UserRestController {
     // 부분수정이라서 PatchMapping으로
     @PatchMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetail){
-        User existUser = userRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("User Not Found", HttpStatus.NOT_FOUND));
+        final User existUser = getExistUser(userRepository.findById(id));
         //setter method 호출
         existUser.setName(userDetail.getName());
 //        User updatedUser = userRepository.save(existUser);
 //        return ResponseEntity.ok(updatedUser);
         return ResponseEntity.ok(userRepository.save(existUser));
+    }
+
+    // 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        final User user = getExistUser(userRepository.findById(id));
+        userRepository.delete(user);
+        //return ResponseEntity.ok().build();
+        //return ResponseEntity.noContent().build();  //ResponseEntity<void> 설정일 경우
+        return ResponseEntity.ok("User Deleted");   // 결과 메시지를 주고 싶을 경우
+    }
+
+    // 공통 함수
+    private User getExistUser(Optional<User> optionalUser) {
+        User existUser = optionalUser
+                .orElseThrow(() -> new BusinessException("User Not Found", HttpStatus.NOT_FOUND));
+        return existUser;
     }
 }
