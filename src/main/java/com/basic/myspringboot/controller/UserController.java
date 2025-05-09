@@ -58,6 +58,7 @@ public class UserController {
         return "update-user";
     }
 
+    // 수정
     // BindingResult는 @Valid 실행 결과를 담음.
     @PostMapping("/update/{id}")
     public String updateUser(@PathVariable("id") long id,
@@ -68,6 +69,14 @@ public class UserController {
             return "update-user";
         }
         userRepository.save(user);
+        return "redirect:/index";
+    }
+
+    // 삭제
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable("id") long id) {
+        User user= userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+        userRepository.delete(user);
         return "redirect:/index";
     }
 }
