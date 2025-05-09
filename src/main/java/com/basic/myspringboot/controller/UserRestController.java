@@ -5,6 +5,7 @@ import com.basic.myspringboot.entity.User;
 import com.basic.myspringboot.exception.BusinessException;
 import com.basic.myspringboot.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,16 +15,18 @@ import java.util.Optional;
 
 // @Controller + @ResponseBody
 @RestController
-@RequiredArgsConstructor    //lombok, final인 변수를 초기화하는 생성자를 자동으로 생성해주는 역할을 하는 롬복 어노테이션
+@RequiredArgsConstructor
+//lombok, final인 변수를 초기화하는 생성자를 자동으로 생성해주는 역할을 하는 롬복 어노테이션
 @RequestMapping("/api/users")
+@Profile("test")    // 현재 prod를 사용하고 있는데, 해당 controller를 실행하고 싶지 않아서 profile("test")를 넣어줌
 public class UserRestController {
     private final UserRepository userRepository;
 
-    // Constructor Injection
-//    public UserRestController(UserRepository userRepository) {
-//        System.out.println(">>> UserController " + userRepository.getClass().getName());
-//        this.userRepository = userRepository;
-//    }
+    /* Constructor Injection
+    public UserRestController(UserRepository userRepository) {
+        System.out.println(">>> UserController " + userRepository.getClass().getName());
+        this.userRepository = userRepository;
+    }*/
 
     @PostMapping
     public User create(@RequestBody User user) {

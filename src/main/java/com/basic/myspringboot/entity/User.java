@@ -26,7 +26,7 @@ public class User {
 
     @Column(unique = true, nullable= false)
     @NotBlank(message = "Email is mandatory")
-    @Email  // email 형식 체크
+    @Email()  // email 형식 체크
     private String email;
     
     @Column(nullable= false, updatable = false)

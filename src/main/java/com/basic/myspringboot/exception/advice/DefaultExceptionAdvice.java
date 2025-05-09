@@ -1,14 +1,20 @@
 package com.basic.myspringboot.exception.advice;
 
 import com.basic.myspringboot.exception.BusinessException;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,5 +65,48 @@ public class DefaultExceptionAdvice {
         log.error(e.getMessage(), e);
 
         return new ResponseEntity<ErrorObject>(errorObject, HttpStatusCode.valueOf(500));
+    }
+
+    // GlobalExceptionHandler에 있는 코드 가져옴
+    // 입력항목 검증할 때 오류가 발생할 때 동작하는 메서드
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<DefaultExceptionAdvice.ValidationErrorResponse> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+
+        // 오류 발생 시, 결과
+        DefaultExceptionAdvice.ValidationErrorResponse response = new DefaultExceptionAdvice.ValidationErrorResponse(
+                400,
+                "입력항목 검증 오류",
+                LocalDateTime.now(),
+                errors  // dto
+        );
+
+        // badRequest() : 400오류
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class ErrorResponse {
+        private int status;
+        private String message;
+        private LocalDateTime timestamp;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class ValidationErrorResponse {
+        private int status;
+        private String message;
+        private LocalDateTime timestamp;
+        private Map<String, String> errors;
     }
 }
