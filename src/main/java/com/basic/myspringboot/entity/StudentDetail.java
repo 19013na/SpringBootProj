@@ -14,10 +14,10 @@ import java.time.LocalDate;
 @Builder
 @Getter @Setter
 public class StudentDetail {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "student_id")
+    @Column(name = "student_detail_id")
     private Long id;
     
     @Column(nullable = false)

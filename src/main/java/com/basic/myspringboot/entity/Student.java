@@ -3,6 +3,7 @@ package com.basic.myspringboot.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+// Non-Owner (종속)
 @Entity
 @Table(name = "students")
 @NoArgsConstructor
@@ -14,7 +15,7 @@ public class Student {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "student_detail_id")
+    @Column(name = "student_id")
     private Long id;
     
     @Column(nullable = false)
