@@ -7,6 +7,7 @@ import com.basic.myspringboot.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,11 +20,12 @@ import java.util.Optional;
 public class UserRestController {
     private final UserRepository userRepository;
 
-    // Constructor Injection
-//    public UserRestController(UserRepository userRepository) {
-//        System.out.println(">>> UserController " + userRepository.getClass().getName());
-//        this.userRepository = userRepository;
-//    }
+    // AUTH
+    @GetMapping("/welcome")
+    public String welcome() {
+        return "Welcome this endpoint is not secure";
+    }
+
 
     @PostMapping
     public User create(@RequestBody User user) {
@@ -31,11 +33,15 @@ public class UserRestController {
     }
 
     @GetMapping
+    // 관리자(Admin) 권한이 있는 사용자만 목록조회(접근) 가능
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<User> getUsers(){
         return userRepository.findAll();
     }
 
     @GetMapping("/{id}")
+    // 일반 사용자(User) 권한이 있는 사용자만 조회(접근) 가능
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     public ResponseEntity<User> getUserById(@PathVariable Long id){
         Optional<User> optionalUser = userRepository.findById(id);
         // public <U> Optional<U> map(Function<? super T. ? extends U> mapper)
