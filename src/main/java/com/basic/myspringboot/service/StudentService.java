@@ -84,7 +84,7 @@ public class StudentService {
             student.setStudentDetail(studentDetail);
         }
 
-        // Student와 StudentDetail의 라이프 사이클이 동일하므로 Student만 저장함. Save and return the student
+        // Student와 StudentDetail의 라이프 사이클이 동일하므로 Student만 저장함.
         Student savedStudent = studentRepository.save(student);
         // Student를 StudentDTO.Response로 변환
         return StudentDTO.Response.fromEntity(savedStudent);
@@ -97,8 +97,9 @@ public class StudentService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND,
                         "Student", "id", id));
 
-        // Check if another student already has the student number
+        // 저장된 학번과 요청된 학번이 일치하지 않으면
         if (!student.getStudentNumber().equals(request.getStudentNumber()) &&
+                // 요청한 학번이 중복되는지 체크하기 위해서 해당 학번으로 Student 소환
                 studentRepository.existsByStudentNumber(request.getStudentNumber())) {
             throw new BusinessException(ErrorCode.STUDENT_NUMBER_DUPLICATE,
                     request.getStudentNumber());
@@ -110,12 +111,16 @@ public class StudentService {
 
         // Update student detail if provided
         if (request.getDetailRequest() != null) {
+            // Student가 연관된 StudentDetail 객체를 가져오기
             StudentDetail studentDetail = student.getStudentDetail();
 
-            // Create new detail if not exists
+            // Create new detail if not exists (저장된 StudentDetail 정보가 없을 경우)
             if (studentDetail == null) {
+                // 새로운 StudentDetail 객체생성
                 studentDetail = new StudentDetail();
+                // 연관된 Student 정보 저장
                 studentDetail.setStudent(student);
+                // 연관된 StudentDetail 객체 저장
                 student.setStudentDetail(studentDetail);
             }
 
