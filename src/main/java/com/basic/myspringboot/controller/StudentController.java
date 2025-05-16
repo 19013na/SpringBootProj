@@ -43,7 +43,7 @@ public class StudentController {
         return new ResponseEntity<>(createdStudent, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id} ")
     public ResponseEntity<StudentDTO.Response> updateStudent(
             @PathVariable Long id,
             @Valid @RequestBody StudentDTO.Request request) {
